@@ -7,6 +7,15 @@ any conforming remote MCP server can be used through the generic adapter.
 There is no hosted account, relay, or developer-controlled service. Traffic
 goes directly from the user's computer to each configured WordPress site.
 
+![WP MCP Hub architecture](captura/esquema.png)
+
+## Local dashboard
+
+The loopback web dashboard keeps site configuration, connection checks, OAuth,
+activity, diagnostics, and local client configuration in one place.
+
+![WP MCP Hub local dashboard](captura/program_principal.png)
+
 ## Status
 
 This is an alpha release. Streamable HTTP is the primary remote transport;
