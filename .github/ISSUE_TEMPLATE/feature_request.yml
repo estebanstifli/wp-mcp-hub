@@ -1,0 +1,28 @@
+name: Feature request
+description: Suggest a focused improvement to WP MCP Hub.
+title: "feat: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the idea. Please do not include live credentials, production
+        URLs, or customer data.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem to solve
+      description: What workflow or limitation would this improve?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Describe the desired behavior and, if useful, alternatives.
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context

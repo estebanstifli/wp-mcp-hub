@@ -5,14 +5,23 @@ build-backend = "hatchling.build"
 [project]
 name = "wp-mcp-hub"
 version = "0.1.0"
-description = "Local, vendor-neutral hub for remote WordPress MCP servers"
+description = "Local, vendor-neutral MCP hub for connecting AI clients to multiple WordPress MCP servers"
 readme = "README.md"
 requires-python = ">=3.11"
 license = { file = "LICENSE" }
 authors = [{ name = "WP MCP Hub contributors" }]
+keywords = [
+  "ai-agents",
+  "claude-desktop",
+  "mcp",
+  "model-context-protocol",
+  "wordpress",
+  "wordpress-mcp",
+]
 classifiers = [
   "Development Status :: 3 - Alpha",
   "License :: OSI Approved :: Apache Software License",
+  "Operating System :: OS Independent",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
@@ -37,6 +46,12 @@ dependencies = [
   "structlog>=25.4,<26",
   "uvicorn>=0.35,<1",
 ]
+
+[project.urls]
+Homepage = "https://github.com/estebanstifli/wp-mcp-hub"
+Documentation = "https://github.com/estebanstifli/wp-mcp-hub/tree/main/docs"
+Repository = "https://github.com/estebanstifli/wp-mcp-hub"
+Issues = "https://github.com/estebanstifli/wp-mcp-hub/issues"
 
 [project.optional-dependencies]
 dev = [

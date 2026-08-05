@@ -1,11 +1,29 @@
-# WP MCP Hub
+# WordPress MCP Hub
 
-WP MCP Hub is a local, cross-platform gateway that presents multiple remote
-WordPress MCP servers through one MCP stdio connection. It is vendor-neutral:
-any conforming remote MCP server can be used through the generic adapter.
+[![CI](https://github.com/estebanstifli/wp-mcp-hub/actions/workflows/ci.yml/badge.svg)](https://github.com/estebanstifli/wp-mcp-hub/actions/workflows/ci.yml)
+[![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/)
+[![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
+
+WordPress MCP Hub is a local, cross-platform [Model Context Protocol (MCP)](https://modelcontextprotocol.io/)
+gateway for connecting Claude Desktop and other AI clients to multiple remote
+WordPress MCP servers through one stdio connection. It is vendor-neutral: any
+conforming remote MCP server can be used through the generic adapter.
 
 There is no hosted account, relay, or developer-controlled service. Traffic
 goes directly from the user's computer to each configured WordPress site.
+
+## Why WordPress MCP Hub?
+
+- **One local MCP server, many WordPress sites.** Discover, test, and call tools
+  exposed by each connected remote server.
+- **Works with standard MCP clients.** Use it with Claude Desktop or any client
+  that supports MCP over stdio.
+- **Authentication without a hosted relay.** OAuth 2.1, Bearer tokens, API keys,
+  custom headers, and unauthenticated development endpoints are supported.
+- **Local-first security.** Credentials are kept in the operating system's
+  credential store; SQLite contains only references to them.
+- **Operational visibility.** The local dashboard provides site management,
+  diagnostics, audit activity, and generated client configuration.
 
 ![WP MCP Hub architecture](captura/esquema.png)
 
@@ -37,20 +55,20 @@ remote schema hash.
 Python 3.11 or newer is required.
 
 ```console
-pipx install wp-mcp-hub
+pipx install "git+https://github.com/estebanstifli/wp-mcp-hub.git"
 wp-mcp-hub web
 ```
 
 For a one-off installation:
 
 ```console
-uvx --from wp-mcp-hub wp-mcp-hub web
+uvx --from git+https://github.com/estebanstifli/wp-mcp-hub.git wp-mcp-hub web
 ```
 
 From a Git checkout:
 
 ```console
-git clone https://github.com/YOUR-ACCOUNT/wp-mcp-hub.git
+git clone https://github.com/estebanstifli/wp-mcp-hub.git
 cd wp-mcp-hub
 python -m venv .venv
 ```
@@ -127,5 +145,11 @@ uv build
 
 See [architecture](docs/architecture.md), [security model](docs/security-model.md),
 [behavioral contract](docs/behavior.md), and [client configuration](docs/client-configuration.md).
+
+## Contributing and security
+
+Contributions are welcome; please read [CONTRIBUTING.md](CONTRIBUTING.md) before
+opening a pull request. If you discover a vulnerability, follow the private
+reporting guidance in [SECURITY.md](SECURITY.md) instead of opening a public issue.
 
 Licensed under Apache-2.0.
