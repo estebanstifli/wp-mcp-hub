@@ -43,7 +43,7 @@ dependencies = [
   "python-multipart>=0.0.20,<1",
   "secretstorage>=3.3,<4; sys_platform == 'linux'",
   "sqlalchemy[asyncio]>=2.0.41,<3",
-  "structlog>=25.4,<26",
+  "structlog>=25.4,<27",
   "uvicorn>=0.35,<1",
 ]
 
