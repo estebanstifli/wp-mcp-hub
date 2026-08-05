@@ -111,9 +111,7 @@ def create_web_app(existing_container: AppContainer | None = None) -> FastAPI:
     async def index(request: Request) -> HTMLResponse:
         sites = await container(request).hub.list_sites()
         launcher = Path(sys.argv[0])
-        mcp_command = str(
-            launcher.parent / ("python.exe" if sys.platform == "win32" else "python")
-        )
+        mcp_command = str(launcher.parent / ("python.exe" if sys.platform == "win32" else "python"))
         return templates.TemplateResponse(
             request,
             "index.html",

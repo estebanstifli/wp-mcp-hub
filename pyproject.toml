@@ -12,10 +12,15 @@ license = { file = "LICENSE" }
 authors = [{ name = "WP MCP Hub contributors" }]
 keywords = [
   "ai-agents",
+  "chatgpt",
+  "claude",
   "claude-desktop",
+  "gemini-cli",
   "mcp",
   "model-context-protocol",
+  "woocommerce",
   "wordpress",
+  "wordpress-management",
   "wordpress-mcp",
 ]
 classifiers = [
