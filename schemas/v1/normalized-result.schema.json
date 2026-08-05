@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://wp-mcp-hub.dev/schemas/v1/normalized-result.schema.json",
+  "title": "Normalized per-site result",
+  "type": "object",
+  "required": ["schema_version", "site_id", "status", "duration_ms", "warnings", "errors"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "site_id": {"type": "string", "format": "uuid"},
+    "status": {"enum": ["ok", "warning", "error", "cancelled"]},
+    "duration_ms": {"type": "integer", "minimum": 0},
+    "warnings": {"type": "array", "items": {"type": "string"}},
+    "errors": {"type": "array", "items": {"type": "string"}},
+    "protocol_version": {"type": ["string", "null"]},
+    "tool_count": {"type": ["integer", "null"], "minimum": 0},
+    "checked_at": {"type": "string", "format": "date-time"},
+    "data": {}
+  },
+  "additionalProperties": false
+}

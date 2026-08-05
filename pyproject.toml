@@ -1,0 +1,76 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "wp-mcp-hub"
+version = "0.1.0"
+description = "Local, vendor-neutral hub for remote WordPress MCP servers"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { file = "LICENSE" }
+authors = [{ name = "WP MCP Hub contributors" }]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "License :: OSI Approved :: Apache Software License",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+]
+dependencies = [
+  "aiosqlite>=0.21,<1",
+  "alembic>=1.16,<2",
+  "fastapi>=0.116,<1",
+  "filelock>=3.18,<4",
+  "httpx>=0.28,<1",
+  "httpx2>=2.9,<3",
+  "jinja2>=3.1,<4",
+  "keyring>=25.6,<26",
+  "mcp>=2.0.0,<2.1",
+  "platformdirs>=4.3,<5",
+  "pydantic>=2.11,<3",
+  "pydantic-settings>=2.10,<3",
+  "python-multipart>=0.0.20,<1",
+  "secretstorage>=3.3,<4; sys_platform == 'linux'",
+  "sqlalchemy[asyncio]>=2.0.41,<3",
+  "structlog>=25.4,<26",
+  "uvicorn>=0.35,<1",
+]
+
+[project.optional-dependencies]
+dev = [
+  "jsonschema>=4.25,<5",
+  "mypy>=1.17,<2",
+  "pytest>=8.4,<9",
+  "pytest-asyncio>=1.1,<2",
+  "pytest-cov>=6.2,<7",
+  "ruff>=0.12,<1",
+  "types-jsonschema>=4.25,<5",
+]
+
+[project.scripts]
+wp-mcp-hub = "wp_mcp_hub.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/wp_mcp_hub"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"schemas" = "wp_mcp_hub/schemas"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "ASYNC", "S", "RUF"]
+ignore = ["S101", "S105", "ASYNC109"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+packages = ["wp_mcp_hub"]

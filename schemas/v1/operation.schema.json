@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://wp-mcp-hub.dev/schemas/v1/operation.schema.json",
+  "title": "WP MCP Hub multi-site operation",
+  "type": "object",
+  "required": ["schema_version", "operation_id", "kind", "status", "site_ids", "results"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "operation_id": {"type": "string", "format": "uuid"},
+    "kind": {"enum": ["diagnose", "test", "tool_call"]},
+    "status": {"enum": ["pending", "running", "completed", "partial", "failed"]},
+    "site_ids": {"type": "array", "items": {"type": "string", "format": "uuid"}},
+    "results": {
+      "type": "array",
+      "items": {"$ref": "normalized-result.schema.json"}
+    }
+  },
+  "additionalProperties": false
+}

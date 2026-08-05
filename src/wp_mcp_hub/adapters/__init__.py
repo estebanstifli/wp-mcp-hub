@@ -1,0 +1,1 @@
+"""Provider-neutral MCP adapters."""

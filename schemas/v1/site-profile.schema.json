@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://wp-mcp-hub.dev/schemas/v1/site-profile.schema.json",
+  "title": "WP MCP Hub site profile",
+  "type": "object",
+  "required": ["schema_version", "id", "name", "mcp_url", "transport", "adapter"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "id": {"type": "string", "format": "uuid"},
+    "name": {"type": "string", "minLength": 1, "maxLength": 200},
+    "mcp_url": {"type": "string", "format": "uri"},
+    "transport": {"enum": ["streamable_http", "sse"]},
+    "adapter": {"type": "string", "default": "generic"},
+    "allow_private_network": {"type": "boolean", "default": false},
+    "enabled": {"type": "boolean", "default": true},
+    "status": {"enum": ["disconnected", "connected", "error"]},
+    "created_at": {"type": "string", "format": "date-time"},
+    "updated_at": {"type": "string", "format": "date-time"}
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,5 @@
+{
+  "resource": "https://wordpress.example/mcp",
+  "authorization_servers": ["https://wordpress.example/oauth"],
+  "scopes_supported": ["mcp:read"]
+}

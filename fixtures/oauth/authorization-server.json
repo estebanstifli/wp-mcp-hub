@@ -1,0 +1,7 @@
+{
+  "issuer": "https://wordpress.example/oauth",
+  "authorization_endpoint": "https://wordpress.example/oauth/authorize",
+  "token_endpoint": "https://wordpress.example/oauth/token",
+  "registration_endpoint": "https://wordpress.example/oauth/register",
+  "code_challenge_methods_supported": ["S256"]
+}

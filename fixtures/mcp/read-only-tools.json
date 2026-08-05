@@ -1,0 +1,14 @@
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "tools": [
+      {
+        "name": "wp_get_title",
+        "description": "Return the site title",
+        "inputSchema": {"type": "object", "properties": {}, "additionalProperties": false},
+        "annotations": {"readOnlyHint": true, "destructiveHint": false}
+      }
+    ]
+  }
+}
