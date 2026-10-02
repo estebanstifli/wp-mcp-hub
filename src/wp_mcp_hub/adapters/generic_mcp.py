@@ -47,7 +47,11 @@ class GenericMcpAdapter:
                 )
             else:
                 transport = streamable_http_client(site.mcp_url, http_client=http_client)
-            async with Client(transport, read_timeout_seconds=request_timeout) as client:
+            async with Client(
+                transport,
+                read_timeout_seconds=request_timeout,
+                mode="legacy" if site.transport is TransportKind.SSE else "auto",
+            ) as client:
                 yield client
 
     async def test(
@@ -56,19 +60,18 @@ class GenericMcpAdapter:
         return await self._retry_read(lambda: self._test_once(site, headers))
 
     async def ping(self, site: Site, headers: dict[str, str] | None = None) -> str | None:
-        """Perform only the MCP ping handshake; do not discover or cache tools."""
+        """Check MCP discovery/initialization without listing or calling tools."""
         return await self._retry_read(lambda: self._ping_once(site, headers))
 
     async def _ping_once(self, site: Site, headers: dict[str, str] | None = None) -> str | None:
         async with self._client(site, headers) as client:
-            await client.send_ping()
+            # Entering Client performs modern discovery or the legacy handshake.
             return client.protocol_version
 
     async def _test_once(
         self, site: Site, headers: dict[str, str] | None = None
     ) -> tuple[str | None, int]:
         async with self._client(site, headers) as client:
-            await client.send_ping()
             tools = await client.list_tools()
             return client.protocol_version, len(tools.tools)
 

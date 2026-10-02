@@ -307,6 +307,7 @@ class OAuthManager:
             str(endpoint),
             json={
                 "client_name": "WP MCP Hub",
+                "application_type": "native",
                 "redirect_uris": [self._redirect_uri],
                 "grant_types": ["authorization_code", "refresh_token"],
                 "response_types": ["code"],

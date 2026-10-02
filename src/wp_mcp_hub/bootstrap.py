@@ -5,6 +5,7 @@ from dataclasses import dataclass
 import httpx
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 
+from wp_mcp_hub import __version__
 from wp_mcp_hub.adapters.generic_mcp import GenericMcpAdapter
 from wp_mcp_hub.adapters.registry import AdapterRegistry
 from wp_mcp_hub.application.services import HubService
@@ -53,7 +54,7 @@ async def create_container(settings: Settings | None = None) -> AppContainer:
             connect=settings.connect_timeout_seconds,
         ),
         follow_redirects=False,
-        headers={"User-Agent": "WP-MCP-Hub/0.1.0"},
+        headers={"User-Agent": f"WP-MCP-Hub/{__version__}"},
     )
     auth_store = SqlAlchemyAuthMetadataStore(sessions)
     oauth = OAuthManager(

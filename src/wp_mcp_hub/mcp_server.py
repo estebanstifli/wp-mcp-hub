@@ -5,6 +5,7 @@ from uuid import UUID
 
 from mcp.server import MCPServer
 
+from wp_mcp_hub import __version__
 from wp_mcp_hub.bootstrap import AppContainer
 from wp_mcp_hub.domain.models import ToolCallRequest
 
@@ -13,7 +14,7 @@ def build_mcp_server(container: AppContainer) -> MCPServer:
     server = MCPServer(
         "WP MCP Hub",
         description="Vendor-neutral local gateway to configured WordPress MCP servers",
-        version="0.1.0",
+        version=__version__,
     )
 
     @server.tool()

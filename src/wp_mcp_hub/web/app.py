@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+import os
 import secrets
+import shutil
+import subprocess
 import sys
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
@@ -16,6 +19,7 @@ from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel, Field, SecretStr
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
+from wp_mcp_hub import __version__
 from wp_mcp_hub.bootstrap import AppContainer, create_container
 from wp_mcp_hub.config import activity_preferences, save_activity_preferences, save_web_port
 from wp_mcp_hub.credentials.keyring_backend import KeyringCredentialStore
@@ -73,7 +77,7 @@ def create_web_app(existing_container: AppContainer | None = None) -> FastAPI:
         if existing_container is None:
             await container.close()
 
-    app = FastAPI(title="WP MCP Hub", version="0.1.0", lifespan=lifespan)
+    app = FastAPI(title="WP MCP Hub", version=__version__, lifespan=lifespan)
     app.add_middleware(
         TrustedHostMiddleware,
         allowed_hosts=["127.0.0.1", "localhost", "testserver"],
@@ -110,8 +114,7 @@ def create_web_app(existing_container: AppContainer | None = None) -> FastAPI:
     @app.get("/", response_class=HTMLResponse)
     async def index(request: Request) -> HTMLResponse:
         sites = await container(request).hub.list_sites()
-        launcher = Path(sys.argv[0])
-        mcp_command = str(launcher.parent / ("python.exe" if sys.platform == "win32" else "python"))
+        mcp_command = sys.executable
         return templates.TemplateResponse(
             request,
             "index.html",
@@ -122,6 +125,9 @@ def create_web_app(existing_container: AppContainer | None = None) -> FastAPI:
                 "config_dir": str(container(request).paths.config_dir),
                 "mcp_command": mcp_command,
                 "mcp_args": ["-m", "wp_mcp_hub.cli", "mcp"],
+                "claude_config_path": str(_client_config_path("claude")),
+                "codex_config_path": str(_client_config_path("codex")),
+                "client_config_open_supported": _client_config_open_supported(),
             },
         )
 
@@ -320,7 +326,21 @@ def create_web_app(existing_container: AppContainer | None = None) -> FastAPI:
             "credential_backend_available": available,
             "activity_enabled": activity_preferences()[0],
             "activity_trace_level": activity_preferences()[1],
+            "claude_config_path": str(_client_config_path("claude")),
+            "codex_config_path": str(_client_config_path("codex")),
+            "client_config_open_supported": _client_config_open_supported(),
         }
+
+    @app.post("/settings/client-config/{client_name}/open")
+    async def open_client_config(
+        client_name: Literal["claude", "codex"],
+        _: None = awaitable_dependency(require_csrf),
+    ) -> dict[str, object]:
+        try:
+            path = _open_client_config(client_name)
+        except (OSError, RuntimeError) as exc:
+            raise HTTPException(status_code=500, detail=str(exc)) from exc
+        return {"opened": True, "path": str(path)}
 
     @app.put("/settings/web")
     async def update_web_settings(
@@ -388,6 +408,68 @@ def _import_auth(headers: dict[str, Any]) -> tuple[str, SecretStr | None, str | 
     if header_name.lower() == "authorization" and secret.lower().startswith("bearer "):
         return "static_bearer", SecretStr(secret[7:]), None
     return "custom_header", SecretStr(secret), header_name
+
+
+def _client_config_path(client_name: Literal["claude", "codex"]) -> Path:
+    if client_name == "codex":
+        configured_home = os.environ.get("CODEX_HOME")
+        codex_home = (
+            Path(configured_home).expanduser() if configured_home else Path.home() / ".codex"
+        )
+        return codex_home / "config.toml"
+    if sys.platform == "win32":
+        roaming = os.environ.get("APPDATA")
+        base = Path(roaming) if roaming else Path.home() / "AppData" / "Roaming"
+        return base / "Claude" / "claude_desktop_config.json"
+    if sys.platform == "darwin":
+        return (
+            Path.home()
+            / "Library"
+            / "Application Support"
+            / "Claude"
+            / "claude_desktop_config.json"
+        )
+    return Path.home() / ".config" / "Claude" / "claude_desktop_config.json"
+
+
+def _client_config_open_supported() -> bool:
+    opener = (
+        "notepad.exe"
+        if sys.platform == "win32"
+        else "open"
+        if sys.platform == "darwin"
+        else "xdg-open"
+    )
+    return shutil.which(opener) is not None
+
+
+def _open_client_config(client_name: Literal["claude", "codex"]) -> Path:
+    path = _client_config_path(client_name)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    if not path.exists():
+        initial_content = '{\n  "mcpServers": {}\n}\n' if client_name == "claude" else ""
+        path.write_text(initial_content, encoding="utf-8")
+
+    opener_name = (
+        "notepad.exe"
+        if sys.platform == "win32"
+        else "open"
+        if sys.platform == "darwin"
+        else "xdg-open"
+    )
+    opener = shutil.which(opener_name)
+    if opener is None:
+        raise RuntimeError(f"No supported text editor launcher was found ({opener_name})")
+    arguments = [opener, str(path)]
+    if sys.platform == "darwin":
+        arguments.insert(1, "-t")
+    subprocess.Popen(  # noqa: S603
+        arguments,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+        start_new_session=sys.platform != "win32",
+    )
+    return path
 
 
 app = create_web_app()

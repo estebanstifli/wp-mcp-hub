@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from datetime import UTC, datetime, timedelta
 from urllib.parse import parse_qs, urlsplit
 from uuid import UUID, uuid4
@@ -96,6 +97,7 @@ async def test_oauth_pkce_exchange_and_refresh() -> None:
                 },
             )
         if request.url.path == "/register":
+            assert json.loads(request.content)["application_type"] == "native"
             return httpx.Response(201, json={"client_id": "dynamic-client"})
         if request.url.path == "/token":
             data = {key: values[0] for key, values in parse_qs(request.content.decode()).items()}

@@ -6,9 +6,9 @@
 [![MCP](https://img.shields.io/badge/Model_Context_Protocol-MCP-6f42c1.svg)](https://modelcontextprotocol.io/)
 
 **A free, open-source, local MCP hub for managing multiple WordPress sites from one AI
-client connection.** Connect Claude Desktop, Claude Code, Gemini CLI, Cursor, VS Code,
-Windsurf, Cline, Roo Code, and other local MCP clients to WordPress without paying for a
-hosted relay or sending credentials to a hub provider.
+client connection.** Connect ChatGPT Desktop, Codex, Claude Desktop, Claude Code, Gemini CLI,
+Cursor, VS Code, Windsurf, Cline, Roo Code, and other local MCP clients to WordPress without
+paying for a hosted relay or sending credentials to a hub provider.
 
 WordPress MCP Hub is a cross-platform control plane and gateway. Your AI client connects to
 one small local MCP server over stdio; the Hub then connects directly to the remote MCP server
@@ -104,6 +104,18 @@ run it when adding sites, changing settings, inspecting activity, or completing 
 
 ## AI client compatibility
 
+The Hub uses the official Python MCP SDK 2.2 and supports protocol revision
+`2026-07-28`, while retaining `2025-11-25`, `2025-06-18`, `2025-03-26`, and
+`2024-11-05` compatibility. Local stdio accepts modern discovery and legacy
+initialization. Remote Streamable HTTP detects the server's protocol automatically;
+the optional legacy SSE transport continues to use initialization.
+
+The dashboard's Ping checks protocol discovery/initialization without invoking a
+WordPress tool. The modern protocol removed the `ping` RPC. Each client and remote
+site can use a different supported revision; no manual version setting is required.
+This update does not add optional MCP extensions or a public HTTP endpoint for the Hub.
+See the [official versioning specification](https://modelcontextprotocol.io/specification/2026-07-28/basic/versioning).
+
 The current release exposes its **client-facing connection locally over stdio**. Use the exact
 Python command generated in the dashboard's Settings tab.
 
@@ -113,20 +125,21 @@ Python command generated in the dashboard's Settings tab.
 | Claude Code | Direct local stdio configuration |
 | Gemini CLI | Direct local stdio configuration; Gemini CLI supports stdio MCP servers |
 | Cursor, VS Code, Windsurf, Cline, Roo Code | Direct when the client is configured to launch a local stdio MCP server |
-| Codex and other MCP-capable coding agents | Use when the host accepts a local command plus arguments |
+| Codex CLI, Codex app, and ChatGPT Desktop local coding experience | Direct local stdio through their shared `~/.codex/config.toml` |
 | LibreChat and self-hosted agent platforms | Depends on how that deployment launches local MCP processes |
-| ChatGPT cloud | Not direct in the current alpha; it requires a remote HTTP MCP endpoint or a compatible bridge |
+| ChatGPT web/cloud connectors | Not direct in the current alpha; they require a remote HTTP MCP endpoint or a compatible bridge |
 | OpenAI Responses API | OpenAI models support remote MCP tools, but WP MCP Hub currently provides local stdio ingress rather than a public remote endpoint |
 
-The ChatGPT and OpenAI limitation is deliberate and documented here rather than hidden behind a
-compatibility claim. A future authenticated Streamable HTTP ingress could make a cloud deployment
-possible, but it must include proper OAuth, tenant isolation, HTTPS, secure secret storage, and
-server hardening. Do not expose the current loopback administration server to the internet.
+ChatGPT Desktop and Codex can launch the Hub locally over stdio. The limitation applies to
+ChatGPT's web/cloud connector flow, not to the desktop app's local coding experience. A future
+authenticated Streamable HTTP ingress could make a cloud deployment possible, but it must include
+proper OAuth, tenant isolation, HTTPS, secure secret storage, and server hardening. Do not expose
+the current loopback administration server to the internet.
 
 For Gemini CLI, see Google's
 [MCP server configuration](https://github.com/google-gemini/gemini-cli/blob/main/docs/tools/mcp-server.md).
-For OpenAI model tooling, see the official
-[OpenAI model documentation](https://developers.openai.com/api/docs/models).
+For ChatGPT Desktop and Codex setup, see OpenAI's official
+[Model Context Protocol guide](https://learn.chatgpt.com/docs/extend/mcp).
 
 ## Compatible WordPress MCP servers
 
@@ -308,7 +321,7 @@ uv run wp-mcp-hub web
 
 Open `http://127.0.0.1:8766`, add a WordPress MCP site, and complete its authentication.
 
-## Configure Claude Desktop and other stdio clients
+## Configure Claude Desktop, ChatGPT Desktop, Codex, and other stdio clients
 
 Use Python directly instead of relying on an unsigned application executable. On Windows, add
 the following server definition to the client's `mcpServers` configuration and restart the
@@ -328,6 +341,21 @@ client:
 On macOS or Linux, use the absolute path to `.venv/bin/python` with the same arguments. The
 Settings tab generates the exact absolute command for the current installation, which avoids
 PATH differences between desktop applications and terminal sessions.
+
+Codex CLI, the Codex app, its IDE extension, and the local coding experience in ChatGPT Desktop
+share `~/.codex/config.toml`. Add this TOML block using the same absolute Python path:
+
+```toml
+[mcp_servers.wp-mcp-hub]
+command = "D:\\path\\to\\wp-mcp-hub\\.venv\\Scripts\\python.exe"
+args = ["-m", "wp_mcp_hub.cli", "mcp"]
+```
+
+On Windows, the dashboard shows and can open both Claude Desktop's JSON file and the shared Codex
+TOML file in a text editor. On macOS and Linux it uses the corresponding per-user configuration
+paths and the platform's standard file opener when available. It never replaces an existing
+configuration file: copy the generated block, merge it with any existing servers, save, and
+restart the relevant client or session.
 
 See [client configuration](docs/client-configuration.md) for additional examples.
 
@@ -371,7 +399,8 @@ small, but installation and configuration may still change before 1.0.
 - WordPress capabilities depend entirely on the remote MCP server and plugins installed on each
   site.
 - Streamable HTTP is the primary remote transport; legacy SSE is opt-in.
-- Direct ChatGPT cloud connectivity is not included yet.
+- Direct ChatGPT web/cloud connector connectivity is not included yet; ChatGPT Desktop's local
+  coding experience and Codex can use the Hub over stdio.
 
 ## Frequently asked questions
 
@@ -404,11 +433,12 @@ and arguments. Other Gemini products may have different connector requirements.
 
 ### Does it work with ChatGPT or OpenAI models?
 
-OpenAI models support MCP tooling, but the current Hub accepts client connections through local
-stdio. ChatGPT cloud connectors normally need a remotely reachable MCP endpoint, so direct
-ChatGPT-to-Hub connectivity is not part of this alpha. This distinction does not prevent a
-WordPress server plugin from connecting directly to ChatGPT when that plugin provides a suitable
-remote endpoint.
+Yes for local desktop use: Codex CLI, the Codex app, its IDE extension, and the local coding
+experience in ChatGPT Desktop can launch WP MCP Hub over stdio using their shared
+`~/.codex/config.toml`. ChatGPT web/cloud connectors normally need a remotely reachable MCP
+endpoint, so that separate connection path is not part of this alpha. This distinction does not
+prevent a WordPress server plugin from connecting directly to ChatGPT when that plugin provides a
+suitable remote endpoint.
 
 ### Can it manage WooCommerce, SEO, posts, media, or plugins?
 

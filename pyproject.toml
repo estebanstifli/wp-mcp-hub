@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "wp-mcp-hub"
-version = "0.1.0"
+version = "0.2.0"
 description = "Local, vendor-neutral MCP hub for connecting AI clients to multiple WordPress MCP servers"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -41,7 +41,7 @@ dependencies = [
   "httpx2>=2.9,<3",
   "jinja2>=3.1,<4",
   "keyring>=25.6,<26",
-  "mcp>=2.0.0,<2.1",
+  "mcp>=2.2.0,<2.3",
   "platformdirs>=4.3,<5",
   "pydantic>=2.11,<3",
   "pydantic-settings>=2.10,<3",

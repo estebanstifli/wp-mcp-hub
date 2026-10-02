@@ -5,7 +5,7 @@ from enum import StrEnum
 from typing import Any, Literal
 from uuid import UUID, uuid4
 
-from pydantic import BaseModel, ConfigDict, Field, HttpUrl
+from pydantic import BaseModel, ConfigDict, Field, HttpUrl, JsonValue
 
 
 class TransportKind(StrEnum):
@@ -85,5 +85,5 @@ class ToolCallResult(BaseModel):
     remote_tool_name: str
     is_error: bool
     content: list[dict[str, Any]] = Field(default_factory=list)
-    structured_content: dict[str, Any] | None = None
+    structured_content: JsonValue = None
     duration_ms: int = Field(ge=0)

@@ -6,32 +6,37 @@ First run the local panel and configure sites:
 wp-mcp-hub web
 ```
 
-Then add one stdio MCP server to the host configuration:
+Then add one stdio MCP server to the host configuration. Use the absolute path to the Python
+interpreter that has WP MCP Hub installed; the Settings tab generates it automatically.
+
+For Claude Desktop and other clients that use JSON:
 
 ```json
 {
   "mcpServers": {
     "wp-mcp-hub": {
-      "command": "wp-mcp-hub",
-      "args": ["mcp"]
+      "command": "D:\\path\\to\\wp-mcp-hub\\.venv\\Scripts\\python.exe",
+      "args": ["-m", "wp_mcp_hub.cli", "mcp"]
     }
   }
 }
 ```
 
-For a source checkout, use the absolute project directory:
+On macOS and Linux, replace the command with the absolute path to `.venv/bin/python`.
 
-```json
-{
-  "mcpServers": {
-    "wp-mcp-hub": {
-      "command": "uv",
-      "args": ["--directory", "/absolute/path/to/wp-mcp-hub", "run", "wp-mcp-hub", "mcp"]
-    }
-  }
-}
+Codex CLI, the Codex app, its IDE extension, and the local coding experience in ChatGPT Desktop
+share `~/.codex/config.toml`:
+
+```toml
+[mcp_servers.wp-mcp-hub]
+command = "D:\\path\\to\\wp-mcp-hub\\.venv\\Scripts\\python.exe"
+args = ["-m", "wp_mcp_hub.cli", "mcp"]
 ```
 
-Restart the host after editing its MCP configuration. Exact configuration-file
-locations differ between hosts and operating systems; consult the host's current
-documentation.
+The dashboard can open Claude Desktop's JSON file and the shared Codex TOML file in a local text
+editor on supported desktop operating systems. It does not overwrite or merge an existing file;
+copy the generated block, preserve any existing servers, save, and restart the relevant client or
+session.
+
+ChatGPT web does not read this local configuration. Its hosted connector flow requires a remote
+MCP endpoint; do not expose WP MCP Hub's loopback administration server to the internet.
